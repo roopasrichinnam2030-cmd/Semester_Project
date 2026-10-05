@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TuneWave – Login</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-body">
+
+<div class="auth-container">
+  <!-- Brand Panel -->
+  <div class="auth-brand">
+    <div class="brand-logo">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="url(#grad1)" stroke-width="2">
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+        <path d="M9 18V5l12-2v13"/>
+        <circle cx="6" cy="18" r="3"/>
+        <circle cx="18" cy="16" r="3"/>
+      </svg>
+      <h1>TuneWave</h1>
+    </div>
+    <p class="brand-tagline">Stream. Discover. Feel the music.</p>
+    <ul class="brand-features">
+      <li>🎵 Millions of tracks</li>
+      <li>🎨 Personalized playlists</li>
+      <li>❤️ Save your favorites</li>
+      <li>🔍 Smart search</li>
+    </ul>
+  </div>
+
+  <!-- Login Form -->
+  <div class="auth-form-panel">
+    <h2>Welcome Back</h2>
+    <p class="auth-subtitle">Login to continue your musical journey</p>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+        <span class="error-msg" id="loginEmailError"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+        <span class="error-msg" id="loginPasswordError"></span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Login</button>
+
+      <p class="auth-switch">
+        Don't have an account? <a href="signup.html">Sign up</a>
+      </p>
+
+      <div class="admin-hint">
+        <strong>Demo Admin:</strong><br>
+        Email: admin@tunewave.com<br>
+        Password: Admin@123
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // Initialize sample data on first load
+  seedData();
+
+  // Redirect if already logged in
+  const session = getCurrentUser();
+  if (session) {
+    if (session.role === 'admin') window.location.href = 'admin.html';
+    else window.location.href = 'user.html';
+  }
+
+  // Login form handler
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    clearErrors(['loginEmailError', 'loginPasswordError']);
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    let valid = true;
+
+    if (!email) {
+      showError('loginEmailError', 'Email is required');
+      valid = false;
+    }
+    if (!password) {
+      showError('loginPasswordError', 'Password is required');
+      valid = false;
+    }
+    if (!valid) return;
+
+    const result = loginUser(email, password);
+    if (result.success) {
+      showToast('Login successful! Redirecting...', 'success');
+      setTimeout(() => {
+        window.location.href = result.user.role === 'admin' ? 'admin.html' : 'user.html';
+      }, 800);
+    } else {
+      showError('loginPasswordError', result.message);
+    }
+  });
+</script>
+</body>
+</html>
